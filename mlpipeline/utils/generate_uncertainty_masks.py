@@ -241,6 +241,7 @@ def visualize_new_labels(image_path, img_gt, img_thickness_map, img_boundary_map
 
 def convert_gt(root, in_dir, ext=".png", std_shape=(512, 512)):
     temp_dir = "./temp"
+    os.makedirs(temp_dir, exist_ok=True)
 
     filenames = sorted(os.listdir(os.path.join(root, in_dir)))
     out_dir_c = os.path.join(root, in_dir + "_c")

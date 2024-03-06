@@ -71,11 +71,7 @@ class Evaluator:
         for gt_path in self.gt_paths:
             # Read gt data
             gt_mask = common.read_image(str(gt_path), gray=True)
-            if self.resize_gt:
-                gt_mask = common.resize_mask(gt_mask, (self.cfg.data.image_size, self.cfg.data.image_size))
-                self.target_size = (gt_mask.shape[0], gt_mask.shape[1])
-            else:
-                self.target_size = (gt_mask.shape[0], gt_mask.shape[1])
+            self.target_size = (gt_mask.shape[0], gt_mask.shape[1])
             gt_mask = torch.tensor(gt_mask / 255.0).long().unsqueeze(dim=0).to(self.device)
             self.gt_masks.append(gt_mask)
 
@@ -145,8 +141,7 @@ class Evaluator:
                     output_path = experiment_dir / self.dataset_name / f"{image_name}.pt"
                     output_logits = torch.load(output_path, map_location=self.device)
                     # output_logits = output_logits.squeeze(dim=0)
-                    if not self.resize_gt:
-                        output_logits = resize_output_tensor(output_logits, self.target_size)
+                    output_logits = resize_output_tensor(output_logits, self.target_size)
                     # Collect
                     fold_outputs.append(output_logits)
 
@@ -221,44 +216,6 @@ class Evaluator:
             indent=4)
         return
 
-    def make_csv(self):
-        json_paths = natsorted(Path(self.log_dir).glob(f"*/{self.dataset_name}_*.json"))
-        metric_names = ["IoU", "F1", "Sens", "Spec", "BA"]
-        stat_names = ["mean", "std_error"]
-        fieldnames = ["method"] + [f"{metric}_{stat}" for (metric, stat) in itertools.product(metric_names, stat_names)]
-        text_file = open(Path(self.log_dir) / "temp.txt", "w+")
-        print(len(json_paths))
-
-        with open(Path(self.log_dir) / f"{self.dataset_name}.csv", "w+") as file:
-            writer = csv.DictWriter(file, fieldnames=fieldnames)
-            writer.writeheader()
-
-            for json_path in json_paths:
-                results = json.load(open(json_path))
-                # metric_name = results["method"]
-                method_name = json_path.parent.name.replace("exp_dataset:fives_method:", "")
-
-                row = {
-                    "method": method_name,
-                }
-                line = [method_name]
-
-                for metric_name in metric_names:
-                    mean_value = results["mean"][metric_name] * 100
-                    std_value = results["std"][metric_name] / math.sqrt(len(self.seeds)) * 100
-
-                    row[f"{metric_name}_mean"] = f"{mean_value:.4f}"
-                    row[f"{metric_name}_std_error"] = f"{std_value:.4f}"
-                    item = f"{mean_value:.2f}$_{{\pm{std_value:.2f}}}$"
-                    line.append(item)
-
-                writer.writerow(row)
-                line = " & ".join(line)
-                line += " \\\\"
-                text_file.write(line + "\n")
-
-        text_file.close()
-
 
 @click.command()
 @click.option("--config")
@@ -269,15 +226,12 @@ class Evaluator:
 @click.option("--dataset_name")
 @click.option("--seeds", default="99999", type=str)
 @click.option("--num_folds", default="0")
-@click.option("--run_csv", default=False, type=bool)
 def main(
     config: str,
     output_dir: str, log_dir: str, visual_dir: str,
     metadata_path: str,
     dataset_name: str,
     seeds: str, num_folds: str,
-    run_csv: bool,
-    resize_gt: bool = False,
 ):
     # Get config
     cwd = Path().cwd()
@@ -297,13 +251,8 @@ def main(
         dataset_name=dataset_name,
         seeds=seeds,
         num_folds=num_folds,
-        resize_gt=resize_gt,
     )
-    if run_csv:
-        evaluator.make_csv()
-    else:
-        evaluator.run()
-    return
+    evaluator.run()
 
 
 if __name__ == "__main__":
