@@ -6,7 +6,6 @@ from typing import TypeVar, Optional, Iterator
 from torch.utils.data.dataset import Dataset
 
 # modified from
-# https://raw.githubusercontent.com/bnulihaixia/Deep_metric/master/utils/sampler.py
 class DistributedMPerClassSampler(DistributedSampler):
     """
     At every iteration, this will return m samples per class. For example,

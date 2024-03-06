@@ -46,7 +46,6 @@ class SFA(nn.Module):
             Implementation of Scale-aware feature aggregation module
             References:
                 "SCS-Net: A Scale and Context Sensitive Network for Retinal Vessel Segmentation"
-                <https://www.sciencedirect.com/science/article/pii/S1361841521000712>
 
             Parameters:
                 in_channels (int): number of input channels
@@ -111,7 +110,6 @@ class AFF(nn.Module):
             Implementation of Adaptive feature fusion module
             References:
                 "SCS-Net: A Scale and Context Sensitive Network for Retinal Vessel Segmentation"
-                <https://www.sciencedirect.com/science/article/pii/S1361841521000712>
             Parameters
             ----------
             in_channels (int): number of channels of input

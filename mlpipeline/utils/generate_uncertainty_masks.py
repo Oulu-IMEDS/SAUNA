@@ -230,7 +230,7 @@ def visualize_new_labels(image_path, img_gt, img_thickness_map, img_boundary_map
     img_relation = np.clip(img_relation * 128 + 128, a_min=0, a_max=255).astype(np.uint8)
     # print(img_thickness_map.min(), img_thickness_map.max(), img_uncertainty_map.min(), img_uncertainty_map.max())
 
-    cm = "hot"
+    cm = "inferno"
     img_boundary_map = utils.convert_grayscale_to_heatmap(img_boundary_map, colormap=cm)
     img_thickness_map = utils.convert_grayscale_to_heatmap(img_thickness_map, colormap=cm)
     img_combined = utils.convert_grayscale_to_heatmap(img_combined, colormap=cm)
@@ -241,7 +241,6 @@ def visualize_new_labels(image_path, img_gt, img_thickness_map, img_boundary_map
 
 def convert_gt(root, in_dir, ext=".png", std_shape=(512, 512)):
     temp_dir = "./temp"
-    # temp_dir = "/mnt/d/workspace/lab_work/output/temp"
 
     filenames = sorted(os.listdir(os.path.join(root, in_dir)))
     out_dir_c = os.path.join(root, in_dir + "_c")
@@ -250,7 +249,7 @@ def convert_gt(root, in_dir, ext=".png", std_shape=(512, 512)):
     all_norm_b, all_norm_t = [], []
     target_c_label = "hh"
     tr = None
-    kernel_ratio = 1.0
+    kernel_ratio = 2.0
     file_index = 0
     np.set_printoptions(formatter={'float': lambda x: "{0:0.5f}".format(x)})
 

@@ -38,16 +38,6 @@ class Conv2d_BN(nn.Module):
 
 
 class SqueezeExcitation(nn.Module):
-    """
-    This block implements the Squeeze-and-Excitation block from https://arxiv.org/abs/1709.01507 (see Fig. 1).
-    Parameters ``activation``, and ``scale_activation`` correspond to ``delta`` and ``sigma`` in eq. 3.
-
-    Args:
-        input_channels (int): Number of channels in the input image
-        squeeze_channels (int): Number of squeeze channels
-        activation (Callable[..., nn.Module], optional): ``delta`` activation. Default: ``nn.ReLU``
-        scale_activation (Callable[..., nn.Module]): ``sigma`` activation. Default: ``nn.Sigmoid``
-    """
 
     def __init__(
         self,

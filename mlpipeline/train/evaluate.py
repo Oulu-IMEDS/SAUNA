@@ -99,7 +99,6 @@ class Evaluator:
         preds = (preds * 255).astype(np.uint8).squeeze(axis=-1)
 
         gt_image = common.read_image(str(gt_path), gray=True)
-        # gt_image = cv2.resize(gt_image, (512, 512), interpolation=cv2.INTER_LANCZOS4)
         if gt_image.shape[0] != preds.shape[0] or gt_image.shape[1] != preds.shape[1]:
             preds = cv2.resize(preds, (gt_image.shape[1], gt_image.shape[0]))
 

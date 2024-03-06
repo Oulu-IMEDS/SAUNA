@@ -13,8 +13,6 @@ class ResidualBlock(nn.Module):
             described in ResNet to build this block.
             References:
                 "SCS-Net: A Scale and Context Sensitive Network for Retinal Vessel Segmentation"
-                <https://www.sciencedirect.com/science/article/pii/S1361841521000712#!>
-                "Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>
 
             Parameters:
             ----------

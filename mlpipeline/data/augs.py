@@ -435,8 +435,6 @@ class RandomToneCurve(BaseTransform):
 class CutOut(ImageTransform):
     """Does cutout augmentation.
 
-    https://arxiv.org/abs/1708.04552
-
     Parameters
     ----------
     cutout_size : tuple or int or float or None
