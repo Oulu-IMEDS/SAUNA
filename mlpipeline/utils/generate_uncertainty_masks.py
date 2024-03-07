@@ -260,39 +260,21 @@ def convert_gt(root, in_dir, ext=".png", std_shape=(512, 512)):
             image_name = Path(fullname).stem
             gt = Image.open(fullname).convert("L")
             gt = np.array(gt)
-            gt = utils.resize_by_pillow(gt, std_shape, resample=Image.BICUBIC)
-            gt = cv2.threshold(gt, 120, 255, cv2.THRESH_BINARY)[1]
+            gt = utils.resize_mask(gt, std_shape)
 
-            if target_c_label == "geo":
-                I = torch.from_numpy(gt // 255).unsqueeze_(0).unsqueeze_(0).to("cuda").float()
-                seeds = skeletonize(gt // 255)
-                S = torch.from_numpy(1 - seeds.astype(np.float32)).unsqueeze_(0).unsqueeze_(0).to("cuda").float()
-                # gd = np.squeeze(FastGeodis.generalised_geodesic2d(I, S, v=1e10, lamb=1, iter=4).detach().cpu().numpy())
-                gd = S
-                gamma = 1 / gd.mean()
-                gt_c = np.exp(-gamma * gd)
-                gt_b = gt_t = gt_c
+            gt_b, norm_b = extract_boundary_uncertainty_map(gt, tr)
+            gt_t, norm_t = extract_thickness_uncertainty_map(
+                gt,
+                tr=tr,
+                target_c_label=target_c_label,
+                kernel_ratio=kernel_ratio,
+            )
+            assert not np.any(np.isnan(gt_b)), image_name
+            assert not np.any(np.isnan(gt_t)), image_name
+            all_norm_b.append(norm_b)
+            all_norm_t.append(norm_t)
 
-            elif target_c_label in ["ls", "bls"]:
-                gt = gt // 255
-                boundary = True if target_c_label == "bls" else False
-                gt_c = generate_constant_soft_labels(gt, boundary=boundary)
-                gt_b = gt_t = gt_c
-
-            else:
-                gt_b, norm_b = extract_boundary_uncertainty_map(gt, tr)
-                gt_t, norm_t = extract_thickness_uncertainty_map(
-                    gt,
-                    tr=tr,
-                    target_c_label=target_c_label,
-                    kernel_ratio=kernel_ratio,
-                )
-                assert not np.any(np.isnan(gt_b)), image_name
-                assert not np.any(np.isnan(gt_t)), image_name
-                all_norm_b.append(norm_b)
-                all_norm_t.append(norm_t)
-
-                gt_c = extract_combined_uncertainty_map(gt_b, gt_t, target_c_label)
+            gt_c = extract_combined_uncertainty_map(gt_b, gt_t, target_c_label)
 
             fullname_c = os.path.join(out_dir_c, image_name + ".npy")
             with open(fullname_c, "wb") as f:

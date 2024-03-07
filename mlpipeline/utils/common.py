@@ -229,6 +229,12 @@ def resize_by_pillow(image, size, resample):
     return image
 
 
+def resize_mask(image, size):
+    image = resize_by_pillow(image, size, resample=Image.BICUBIC)
+    image = cv2.threshold(image, 120, 255, cv2.THRESH_BINARY)[1]
+    return image
+
+
 def convert_grayscale_to_heatmap(image, raw_image=None, colormap="inferno", show_path=None):
     colormap = plt.get_cmap(colormap)
 

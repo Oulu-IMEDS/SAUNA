@@ -197,8 +197,7 @@ class RandomResizedCrop(BaseTransform, InterpolationPropertyHolder):
         if self.resize_to is None:
             return mask
 
-        output = utils.resize_by_pillow(mask, self.resize_to[::-1], resample=self.resample)
-        output = cv2.threshold(mask, 120, 255, cv2.THRESH_BINARY)[1]
+        output = utils.resize_mask(mask, self.resize_to[::-1])
         return output
 
     def _apply_labels(self, labels, settings: dict):
