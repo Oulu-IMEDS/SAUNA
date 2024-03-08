@@ -230,8 +230,7 @@ def resize_by_pillow(image, size, resample):
 
 
 def resize_mask(image, size):
-    image = resize_by_pillow(image, size, resample=Image.BICUBIC)
-    image = cv2.threshold(image, 120, 255, cv2.THRESH_BINARY)[1]
+    image = resize_by_pillow(image, size, resample=Image.NEAREST)
     return image
 
 
