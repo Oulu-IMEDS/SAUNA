@@ -50,7 +50,6 @@ class SIAM(nn.Module):
         self.predictor = self.encoder.predictor
 
     def forward(self, image, **args):
-        # 只需保证两组数据提取出的特征标签顺序一致即可
         out = self.encoder(image, **args)
         self.pred = self.encoder.pred
         self.feat = self.encoder.feat
@@ -170,8 +169,8 @@ class SeqNet(nn.Module):
         self.projector = MlpNorm(32, num_emb) # self.fcn.projector#MlpNorm(32, 64, num_emb)
         self.predictor = MlpNorm(num_emb, num_emb) # self.fcn.predictor#MlpNorm(32, 64, num_emb)
 
-        self.morpholer1 = MorphBlock(32+2) # 形态学模块使用一个还是两个哪？
-        self.morpholer2 = MorphBlock(32+2) # 形态学模块使用一个还是两个哪？
+        self.morpholer1 = MorphBlock(32+2)
+        self.morpholer2 = MorphBlock(32+2)
         self.__name__ = "{}X{}".format(self.fcn.__name__, self.seg.__name__)
 
     def constraint(self, aux=None, **args):

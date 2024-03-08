@@ -1,7 +1,6 @@
 # ------------------------------------------------------------------------------
 # Copyright (c) Microsoft
 # Licensed under the MIT License.
-# Modified by Dequan Wang and Xingyi Zhou
 # ------------------------------------------------------------------------------
 
 from __future__ import absolute_import
