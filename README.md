@@ -35,8 +35,8 @@ python -m mlpipeline.train.run experiment=${EXP_NAME} \
         model.params.cfg.arch=${ARCH_NAME}
 ```
 where
-- <EXP_NAME>: experiment setting can be `fives_uncertainty_sem_seg` (ours), `fives_patch_sem_seg` (for high-resolution-based methods), or `fives_whole_sem_seg` (for low-resolution-based methods)
-- <ARCH_NAME>: architecture name can be `Unet`, `UnetPlusPlus`, `IterNet`, `CTF-Net`, `CE-Net`, `DUnet`, `FR-Unet`, `DA-Net`, or `Swin-Unet`.
+- EXP_NAME: experiment setting can be `fives_uncertainty_sem_seg` (ours), `fives_patch_sem_seg` (for high-resolution-based methods), or `fives_whole_sem_seg` (for low-resolution-based methods)
+- ARCH_NAME: architecture name can be `Unet`, `UnetPlusPlus`, `IterNet`, `CTF-Net`, `CE-Net`, `DUnet`, `FR-Unet`, `DA-Net`, or `Swin-Unet`.
 
 ## Evaluation
 ```bash
