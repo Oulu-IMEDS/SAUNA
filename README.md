@@ -6,16 +6,26 @@ SAUNA: Image-level Regression for Uncertainty-aware Retinal Image Segmentation
 We provide file `env.yaml` for dependencies
 
 ## Installation
-      conda env create -f env.yaml
-      conda activate sauna
-      pip install -e .
+```bash
+conda env create -f env.yaml
+conda activate sauna
+pip install -e .
+```
 
+
+## Split data
+```bash
+cd mlpipeline/utils
+python split_fives.py
+```
 
 ## SAUNA transform
 ```bash
 cd mlpipeline/utils
-python ./generate_uncertainty_masks.py
+python ./generate_uncertainty_masks.py --root <ROOT_DIR> --in_dir <GT_DIR>
 ```
+
+
 
 ![SAUNA transform](./imgs/SAUNA_transform.png "SAUNA transform")
 
@@ -41,4 +51,4 @@ python -m mlpipeline.train.evaluate \
     --folds=0,1,2,3,4
 ```
 where
-- DATASET: is either FIVES, STARE, DRIVE, CHASEDB1, or HRF
+- DATASET: is either `FIVES`, `STARE`, `DRIVE`, `CHASEDB1`, or `HRF`.
