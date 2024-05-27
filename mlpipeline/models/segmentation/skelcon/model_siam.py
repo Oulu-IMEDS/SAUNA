@@ -171,6 +171,7 @@ class SeqNet(nn.Module):
 
         self.morpholer1 = MorphBlock(32+2)
         self.morpholer2 = MorphBlock(32+2)
+
         self.__name__ = "{}X{}".format(self.fcn.__name__, self.seg.__name__)
 
     def constraint(self, aux=None, **args):
