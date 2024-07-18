@@ -117,10 +117,13 @@ model:
       image_size: ${data.image_size}
       batch_size: ${data.batch_size}
       two_branches_num_patches: ${data.two_branches_num_patches}
-      loss_name: sjm
+      loss_name: distancesjm-sfl1
       loss_mode: binary
+      loss_type: 1
       pos_weight: 1.0
-      distance_weight: 0.05
+      distance_weight: 1.0
+      alpha: 2.0
+      beta: 1.0
       dropout: 0.0
       pretrained: true
       test_on_patches: false

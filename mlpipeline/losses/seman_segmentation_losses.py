@@ -130,15 +130,81 @@ class DiceBCE(nn.Module):
         return loss
 
 
+class SFLoss(nn.Module):
+    def __init__(self, loss_type=1, alpha=1.0, beta=1.0, secondary_weight=1.0, pos_weight=1.0, base_loss="l1"):
+        super(SFLoss, self).__init__()
+        self.base_loss = base_loss
+
+        if base_loss == "smoothl1":
+            self.criterion = nn.SmoothL1Loss(reduction="none")
+        elif base_loss == "l2":
+            self.criterion = nn.MSELoss(reduction="none")
+        else:
+            self.criterion = nn.L1Loss(reduction="none")
+
+        self.loss_type = loss_type
+        self.alpha = alpha
+        self.beta = beta
+        self.pos_weight = pos_weight
+        self.secondary_weight = secondary_weight
+
+    def forward(self, pred, gt):
+        same_sign_mask = (torch.sign(pred) * torch.sign(gt) > 0)
+        pos_mask = (gt > 0)
+        weight = torch.ones_like(gt)
+
+        weight = torch.where(
+            same_sign_mask,
+            torch.pow(torch.abs(pred - gt), self.beta) * self.alpha,
+            torch.ones_like(gt),
+        )
+        weight = weight * torch.where(
+            pos_mask,
+            torch.full_like(gt, fill_value=self.pos_weight),
+            torch.ones_like(gt),
+        )
+
+        if self.loss_type in [2, 3]:
+            abs_gt = torch.clamp(torch.abs(gt), min=0.4, max=1.0)
+            abs_den = torch.maximum(torch.abs(pred), abs_gt)
+            weight_by_abs = 1.0 / abs_den
+            weight = weight * weight_by_abs
+        elif self.loss_type > 3:
+            raise ValueError("Invalid type!")
+        if self.loss_type in [0, 2]:
+            weight = weight.detach()
+
+        loss = self.criterion(pred, gt)
+        loss = loss * weight
+        loss = torch.mean(loss, dim=(0, 2, 3))
+
+        class_weights = torch.tensor([1.0] + [self.secondary_weight] * (loss.shape[0] - 1), device=loss.device)
+        loss = (loss * class_weights).sum() / class_weights.sum()
+        return loss
+
+
 class DistanceLoss(nn.Module):
     def __init__(self, name, **kwargs):
         super(DistanceLoss, self).__init__()
         self.distance_name = name.replace("distance-", "").lower()
+        loss_type = kwargs.get("loss_type", 1)
+        alpha = kwargs.get("alpha", 2.0)
+        beta = kwargs.get("beta", 1.0)
+        pos_weight = kwargs.get("pos_weight", 1.0)
+        secondary_weight = kwargs.get("secondary_weight", 1.0)
+        base_loss = kwargs.get("base_loss", "sfl1")
 
         self.criterion = {
             "l2": nn.MSELoss(),
             "l1": nn.L1Loss(),
             "smoothl1": nn.SmoothL1Loss(),
+            "sfl1": SFLoss(
+                loss_type=loss_type,
+                alpha=alpha,
+                beta=beta,
+                pos_weight=pos_weight,
+                secondary_weight=secondary_weight,
+                base_loss=base_loss),
         }[self.distance_name]
 
     def forward(self, pred, gt):
@@ -239,12 +305,10 @@ class SoftJaccardLoss(nn.Module):
 class DistanceSoftJaccardLoss(nn.Module):
     def __init__(self, name, **kwargs):
         super(DistanceSoftJaccardLoss, self).__init__()
-        loss_type = kwargs.get("loss_type", 1)
-        kwargs["loss_type"] = 1
 
         distance_name = name.replace("distancesjm-", "distance-").lower()
         self.distance_loss = DistanceLoss(distance_name, **kwargs)
-        self.sjm_loss = SoftJaccardLoss(loss_type=loss_type)
+        self.sjm_loss = SoftJaccardLoss(loss_type=2)
         self.distance_weight = kwargs["distance_weight"]
 
     def forward(self, pred, gt):
