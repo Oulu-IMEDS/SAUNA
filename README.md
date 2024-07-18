@@ -25,9 +25,7 @@ cd mlpipeline/utils
 python ./generate_uncertainty_masks.py --root <ROOT_DIR> --in_dir <GT_DIR>
 ```
 
-
-
-![SAUNA transform](./imgs/SAUNA_transform.png "SAUNA transform")
+<img src="./imgs/SAUNA_transform.png" alt="SAUNA transform" width="1080"/>
 
 ## Training
 ```bash
